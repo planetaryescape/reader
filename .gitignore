@@ -1,0 +1,4 @@
+node_modules
+*.tsbuildinfo
+# dist/ is committed (git-tag installs skip build scripts); a global ignore may hide it
+!/dist/

@@ -1,0 +1,66 @@
+// Re-anchors saved passages by their text, so nothing has to be written into
+// the article HTML. Whitespace is compared loosely because selections are
+// stored with collapsed whitespace.
+function textNodesIn(root) {
+    const nodes = [];
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+        acceptNode: (node) => 
+        // Annotation footnote numbers are not part of the prose
+        node.parentElement?.closest(".annotation-mark sup")
+            ? NodeFilter.FILTER_REJECT
+            : NodeFilter.FILTER_ACCEPT,
+    });
+    while (walker.nextNode())
+        nodes.push(walker.currentNode);
+    return nodes;
+}
+export function normalizeText(text) {
+    return text.replace(/\s+/g, " ").trim();
+}
+function findIn(root, target) {
+    const nodes = textNodesIn(root);
+    let flat = "";
+    const map = [];
+    let lastWasSpace = true;
+    for (const node of nodes) {
+        const data = node.data;
+        for (let i = 0; i < data.length; i++) {
+            const char = data.charAt(i);
+            const isSpace = /\s/.test(char);
+            if (isSpace && lastWasSpace)
+                continue;
+            flat += isSpace ? " " : char;
+            map.push({ node, offset: i });
+            lastWasSpace = isSpace;
+        }
+    }
+    const index = flat.indexOf(target);
+    if (index === -1)
+        return null;
+    const start = map[index];
+    const end = map[index + target.length - 1];
+    if (!start || !end)
+        return null;
+    const range = document.createRange();
+    range.setStart(start.node, start.offset);
+    range.setEnd(end.node, end.offset + 1);
+    return range;
+}
+/** Finds `text` in the preferred paragraph first, then anywhere in `root`. */
+export function findTextRange(root, text, preferred) {
+    const target = normalizeText(text);
+    if (!target)
+        return null;
+    return (preferred && findIn(preferred, target)) || findIn(root, target);
+}
+export function rangeContainsPoint(range, x, y) {
+    for (const rect of range.getClientRects()) {
+        if (x >= rect.left &&
+            x <= rect.right &&
+            y >= rect.top &&
+            y <= rect.bottom) {
+            return true;
+        }
+    }
+    return false;
+}

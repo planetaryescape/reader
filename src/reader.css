@@ -1,0 +1,303 @@
+/*
+ * @planetaryescape/reader: themes, tokens and article typography as plain CSS.
+ * No Tailwind and no typography plugin, so it works with Tailwind 3, 4 or none.
+ *
+ * Select a theme with data-reader-theme="paper|sepia|snow|dusk|night|ink" on
+ * <html> or on any wrapper (class "reader-root" also paints its background).
+ * Typography comes from custom properties the app sets on the same element:
+ *   --reader-font, --reader-size, --reader-leading, --reader-max-width
+ * (readerRootProps() in the JS package produces all of them.)
+ *
+ * Prose rules sit inside :where() and carry no specificity, so any app style
+ * or utility class overrides them.
+ */
+
+/* Themes */
+
+:root,
+[data-reader-theme="paper"] {
+  --reader-bg: #faf8f5;
+  --reader-surface: #ffffff;
+  --reader-fg: #201d1b;
+  --reader-fg-soft: #3b3733;
+  --reader-muted: #70675f;
+  --reader-border: rgba(32, 29, 27, 0.1);
+  --reader-border-strong: rgba(32, 29, 27, 0.2);
+  --reader-chip: rgba(32, 29, 27, 0.05);
+}
+
+[data-reader-theme="night"] {
+  --reader-bg: #201d1b;
+  --reader-surface: #2a2623;
+  --reader-fg: #f3f1ef;
+  --reader-fg-soft: #dcd7d2;
+  --reader-muted: #a3968c;
+  --reader-border: rgba(255, 255, 255, 0.08);
+  --reader-border-strong: rgba(255, 255, 255, 0.17);
+  --reader-chip: rgba(255, 255, 255, 0.06);
+}
+
+[data-reader-theme="sepia"] {
+  --reader-bg: #f3ead8;
+  --reader-surface: #faf4e7;
+  --reader-fg: #3b2e20;
+  --reader-fg-soft: #4a3b2a;
+  --reader-muted: #74624e;
+  --reader-border: rgba(74, 59, 42, 0.14);
+  --reader-border-strong: rgba(74, 59, 42, 0.26);
+  --reader-chip: rgba(74, 59, 42, 0.07);
+}
+
+[data-reader-theme="snow"] {
+  --reader-bg: #ffffff;
+  --reader-surface: #ffffff;
+  --reader-fg: #18181b;
+  --reader-fg-soft: #2e2e33;
+  --reader-muted: #71717a;
+  --reader-border: rgba(0, 0, 0, 0.09);
+  --reader-border-strong: rgba(0, 0, 0, 0.18);
+  --reader-chip: rgba(0, 0, 0, 0.045);
+}
+
+/* A softer dark: warm charcoal rather than near-black */
+[data-reader-theme="dusk"] {
+  --reader-bg: #34302c;
+  --reader-surface: #3e3935;
+  --reader-fg: #f1ece6;
+  --reader-fg-soft: #ddd6ce;
+  --reader-muted: #b3a99e;
+  --reader-border: rgba(255, 255, 255, 0.09);
+  --reader-border-strong: rgba(255, 255, 255, 0.18);
+  --reader-chip: rgba(255, 255, 255, 0.07);
+}
+
+[data-reader-theme="ink"] {
+  --reader-bg: #0e1014;
+  --reader-surface: #161a21;
+  --reader-fg: #e8ebf0;
+  --reader-fg-soft: #c6ccd6;
+  --reader-muted: #7f8796;
+  --reader-border: rgba(255, 255, 255, 0.08);
+  --reader-border-strong: rgba(255, 255, 255, 0.16);
+  --reader-chip: rgba(255, 255, 255, 0.06);
+}
+
+/* Pen and highlighter, light themes first, then the dark ones */
+
+:root,
+[data-reader-theme] {
+  --pen: #3b63d9;
+  --highlighter: rgba(246, 205, 72, 0.45);
+  --reader-focus: color-mix(in srgb, var(--reader-fg) 65%, var(--reader-bg));
+  --reader-annotated: #b07050;
+}
+[data-pen="vermilion"] { --pen: #d1492b; }
+[data-pen="forest"] { --pen: #2f7d47; }
+[data-pen="graphite"] { --pen: #555555; }
+[data-highlighter="green"] { --highlighter: rgba(120, 200, 112, 0.4); }
+[data-highlighter="blue"] { --highlighter: rgba(110, 165, 240, 0.38); }
+[data-highlighter="pink"] { --highlighter: rgba(240, 130, 180, 0.36); }
+
+[data-reader-theme="night"],
+[data-reader-theme="dusk"],
+[data-reader-theme="ink"] {
+  --pen: #7d9cf5;
+  --highlighter: rgba(246, 205, 72, 0.26);
+}
+:is([data-reader-theme="night"], [data-reader-theme="dusk"], [data-reader-theme="ink"])[data-pen="vermilion"] { --pen: #ec7556; }
+:is([data-reader-theme="night"], [data-reader-theme="dusk"], [data-reader-theme="ink"])[data-pen="forest"] { --pen: #62b07a; }
+:is([data-reader-theme="night"], [data-reader-theme="dusk"], [data-reader-theme="ink"])[data-pen="graphite"] { --pen: #b5b0ab; }
+:is([data-reader-theme="night"], [data-reader-theme="dusk"], [data-reader-theme="ink"])[data-highlighter="green"] { --highlighter: rgba(120, 200, 112, 0.26); }
+:is([data-reader-theme="night"], [data-reader-theme="dusk"], [data-reader-theme="ink"])[data-highlighter="blue"] { --highlighter: rgba(110, 165, 240, 0.28); }
+:is([data-reader-theme="night"], [data-reader-theme="dusk"], [data-reader-theme="ink"])[data-highlighter="pink"] { --highlighter: rgba(240, 130, 180, 0.26); }
+
+/* A themed wrapper that paints its own page */
+.reader-root {
+  background: var(--reader-bg);
+  color: var(--reader-fg);
+}
+
+/* Article typography */
+
+.reader-article {
+  position: relative;
+}
+
+:where(.reader-prose) {
+  --pen-soft: color-mix(in srgb, var(--pen) 12%, transparent);
+  font-family: var(--reader-font, Georgia, "Times New Roman", serif);
+  font-size: var(--reader-size, 20px);
+  color: var(--reader-fg-soft);
+  overflow-wrap: anywhere;
+}
+
+:where(.reader-prose :is(h1, h2, h3, h4, h5, h6)) {
+  font-family: var(--reader-font, Georgia, "Times New Roman", serif);
+  font-weight: 500;
+  letter-spacing: -0.025em;
+  line-height: 1.25;
+  color: var(--reader-fg);
+  margin: 1.6em 0 0.5em;
+}
+:where(.reader-prose h1) { font-size: 1.9em; margin-top: 0; }
+:where(.reader-prose h2) { font-size: 1.5em; margin-top: 2em; margin-bottom: 0.6em; }
+:where(.reader-prose h3) { font-size: 1.25em; }
+:where(.reader-prose h4) { font-size: 1.1em; }
+
+:where(.reader-prose :is(p, li, dd, dt)) {
+  line-height: var(--reader-leading, 1.8);
+}
+:where(.reader-prose p) { margin: 0 0 1.2em; }
+
+:where(.reader-prose a) {
+  color: var(--pen);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+:where(.reader-prose strong, .reader-prose b) {
+  color: var(--reader-fg);
+  font-weight: 600;
+}
+
+:where(.reader-prose :is(ul, ol)) { margin: 1.2em 0; padding-left: 1.6em; }
+:where(.reader-prose ul) { list-style: disc; }
+:where(.reader-prose ol) { list-style: decimal; }
+:where(.reader-prose li) { margin: 0.4em 0; padding-left: 0.2em; }
+:where(.reader-prose li)::marker { color: var(--reader-muted); }
+:where(.reader-prose li > :is(ul, ol)) { margin: 0.4em 0; }
+
+:where(.reader-prose blockquote) {
+  margin: 1.6em 0;
+  padding-left: 1em;
+  border-left: 3px solid var(--reader-border-strong);
+  color: var(--reader-fg-soft);
+  font-style: italic;
+}
+:where(.reader-prose blockquote > :first-child) { margin-top: 0; }
+:where(.reader-prose blockquote > :last-child) { margin-bottom: 0; }
+
+:where(.reader-prose hr) {
+  margin: 3em 0;
+  border: 0;
+  border-top: 1px solid var(--reader-border);
+}
+
+:where(.reader-prose :is(img, video)) {
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.5rem;
+}
+/* Lone images get room; icons inside a line of text stay inline. */
+:where(.reader-prose :is(figure > img, p > img:only-child, a > img:only-child, td > img:only-child)) {
+  display: block;
+  margin: 2em auto;
+}
+:where(.reader-prose figure) { margin: 2em 0; }
+:where(.reader-prose figcaption) {
+  margin-top: 0.6em;
+  font-size: 0.85em;
+  line-height: 1.5;
+  color: var(--reader-muted);
+}
+
+:where(.reader-prose :is(code, kbd, samp)) {
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.875em;
+}
+:where(.reader-prose :not(pre) > code) {
+  padding: 0.1em 0.35em;
+  border-radius: 0.25rem;
+  background: var(--reader-chip);
+  color: var(--reader-fg);
+}
+:where(.reader-prose pre) {
+  margin: 1.6em 0;
+  padding: 1em 1.2em;
+  overflow-x: auto;
+  border: 1px solid var(--reader-border-strong);
+  border-radius: 0.75rem;
+  background: var(--reader-surface);
+  color: var(--reader-fg);
+  font-size: 0.875em;
+  line-height: 1.6;
+}
+
+/* Wide tables scroll inside the column instead of stretching it. */
+:where(.reader-prose table) {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+  margin: 1.6em 0;
+  border-collapse: collapse;
+  font-size: 0.9em;
+}
+:where(.reader-prose :is(th, td)) {
+  padding: 0.4em 0.7em;
+  border: 1px solid var(--reader-border);
+  text-align: left;
+  vertical-align: top;
+}
+:where(.reader-prose th) { color: var(--reader-fg); font-weight: 600; }
+:where(.reader-prose :is(sub, sup)) { line-height: 0; }
+
+:where(.reader-justify .reader-prose :is(p, li)) {
+  text-align: justify;
+  hyphens: auto;
+}
+:where(.reader-indented .reader-prose p) { margin-top: 0; margin-bottom: 0; }
+:where(.reader-indented .reader-prose p + p) { text-indent: 1.6em; }
+
+/* Marks drawn over the text with the CSS Custom Highlight API */
+
+::highlight(user-highlight) {
+  background-color: var(--highlighter);
+  color: inherit;
+}
+::highlight(user-underline) {
+  text-decoration: underline 2px var(--pen);
+}
+
+/* Paragraph flash after jumping to a paragraph */
+
+@keyframes reader-para-flash {
+  0%,
+  35% {
+    background-color: var(--highlighter);
+    box-shadow: 0 0 0 6px var(--highlighter);
+  }
+  100% {
+    background-color: transparent;
+    box-shadow: 0 0 0 6px transparent;
+  }
+}
+.para-flash {
+  border-radius: 3px;
+  animation: reader-para-flash 1.8s ease-out;
+}
+@media (prefers-reduced-motion: reduce) {
+  .para-flash { animation: none; }
+}
+
+/* Annotation markers the renderer injects */
+
+.annotation-mark {
+  position: relative;
+  cursor: pointer;
+  color: inherit !important;
+  background: transparent !important;
+  border-bottom: 2px solid #5b7f95;
+  text-decoration: none !important;
+  padding-bottom: 1px;
+}
+.annotation-mark[data-type="cross_reference"] { border-bottom-color: #5b7f95; }
+.annotation-mark[data-type="context"] { border-bottom-color: #7a8f6f; }
+.annotation-mark[data-type="tension"] { border-bottom-color: #b07050; }
+.annotation-mark[data-type="question"] { border-bottom-color: #8b7bb0; }
+.annotation-mark[data-weight="resonant"] { border-bottom-width: 3px; }
+.annotation-mark[data-weight="quiet"] { border-bottom-width: 1px; opacity: 0.7; }
+.annotation-mark[data-weight="quiet"] sup { opacity: 0.5; }
+.annotation-mark[data-active] { border-radius: 2px; }
+.annotation-mark[data-active][data-type="cross_reference"] { background: color-mix(in srgb, #5b7f95 18%, transparent) !important; }
+.annotation-mark[data-active][data-type="context"] { background: color-mix(in srgb, #7a8f6f 18%, transparent) !important; }
+.annotation-mark[data-active][data-type="tension"] { background: color-mix(in srgb, #b07050 18%, transparent) !important; }
+.annotation-mark[data-active][data-type="question"] { background: color-mix(in srgb, #8b7bb0 18%, transparent) !important; }
