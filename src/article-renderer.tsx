@@ -31,6 +31,12 @@ export interface ArticleRendererProps {
   onViewed?: (annotationId: string) => void;
   /** Extra classes for the article body, after the package's `reader-prose`. */
   className?: string;
+  /**
+   * Classes for the outer wrapper, replacing `reader-article`, for an app
+   * that already uses that name. The package's own styles key on the
+   * wrapper's `data-reader-article` attribute, so they still apply.
+   */
+  wrapperClassName?: string;
 }
 
 /** Sanitising needs the browser's DOM, so the body renders after the first client render. */
@@ -122,6 +128,7 @@ export function ArticleRenderer({
   onAnnotationSelect,
   onViewed,
   className,
+  wrapperClassName,
 }: ArticleRendererProps) {
   const bodyRef = useRef<HTMLDivElement>(null);
 
@@ -169,7 +176,8 @@ export function ArticleRenderer({
 
   return (
     <div
-      className="reader-article"
+      data-reader-article
+      className={wrapperClassName ?? "reader-article"}
       onClick={(e) => handleClick(e.target)}
       onKeyDown={(e) => {
         if (e.key !== "Enter" && e.key !== " ") return;

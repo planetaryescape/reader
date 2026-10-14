@@ -63,7 +63,7 @@ function injectAnnotations(html, plainText, annotations) {
     }
     return result;
 }
-export function ArticleRenderer({ content, contentHtml, sanitize, annotations, activeAnnotationId, onAnnotationSelect, onViewed, className, }) {
+export function ArticleRenderer({ content, contentHtml, sanitize, annotations, activeAnnotationId, onAnnotationSelect, onViewed, className, wrapperClassName, }) {
     const bodyRef = useRef(null);
     // Sanitize HTML then inject annotation markers
     // Sanitising needs the browser's DOM, so the article body renders after mount
@@ -100,7 +100,7 @@ export function ArticleRenderer({ content, contentHtml, sanitize, annotations, a
         onAnnotationSelect(annId);
         onViewed?.(annId);
     }, [activeAnnotationId, onAnnotationSelect, onViewed]);
-    return (_jsx("div", { className: "reader-article", onClick: (e) => handleClick(e.target), onKeyDown: (e) => {
+    return (_jsx("div", { "data-reader-article": true, className: wrapperClassName ?? "reader-article", onClick: (e) => handleClick(e.target), onKeyDown: (e) => {
             if (e.key !== "Enter" && e.key !== " ")
                 return;
             if (!e.target.closest(".annotation-mark"))

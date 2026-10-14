@@ -27,5 +27,11 @@ export interface ArticleRendererProps {
     onViewed?: (annotationId: string) => void;
     /** Extra classes for the article body, after the package's `reader-prose`. */
     className?: string;
+    /**
+     * Classes for the outer wrapper, replacing `reader-article`, for an app
+     * that already uses that name. The package's own styles key on the
+     * wrapper's `data-reader-article` attribute, so they still apply.
+     */
+    wrapperClassName?: string;
 }
-export declare function ArticleRenderer({ content, contentHtml, sanitize, annotations, activeAnnotationId, onAnnotationSelect, onViewed, className, }: ArticleRendererProps): import("react").JSX.Element;
+export declare function ArticleRenderer({ content, contentHtml, sanitize, annotations, activeAnnotationId, onAnnotationSelect, onViewed, className, wrapperClassName, }: ArticleRendererProps): import("react").JSX.Element;

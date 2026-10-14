@@ -112,4 +112,14 @@ describe("ArticleRenderer", () => {
       "reader-prose extra",
     );
   });
+
+  it("names the wrapper reader-article unless the caller picks another class", () => {
+    const { view } = setup({ annotations: [] });
+    const wrapper = () =>
+      screen.getByText(/First line/).closest("[data-reader-article]") as HTMLElement;
+    expect(wrapper().className).toBe("reader-article");
+    view.unmount();
+    setup({ annotations: [], wrapperClassName: "my-article" });
+    expect(wrapper().className).toBe("my-article");
+  });
 });

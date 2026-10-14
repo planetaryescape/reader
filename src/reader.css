@@ -119,7 +119,7 @@
 
 /* Article typography */
 
-.reader-article {
+[data-reader-article] {
   position: relative;
 }
 
@@ -200,8 +200,10 @@
   color: var(--reader-muted);
 }
 
+/* No font-family: code keeps the app's own monospace. This sheet is
+   unlayered, so a family set here would beat an app's layered base styles
+   (Tailwind v4's preflight) whatever their specificity. */
 :where(.reader-prose :is(code, kbd, samp)) {
-  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
   font-size: 0.875em;
 }
 :where(.reader-prose :not(pre) > code) {

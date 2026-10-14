@@ -52,7 +52,7 @@ function Article({ item, settings, scheme }) {
 
 Components and hooks (modules with hooks start with `"use client"`):
 
-- `ArticleRenderer`: props `content`, `contentHtml`, `sanitize` (required), `annotations`, `activeAnnotationId`, `onAnnotationSelect`, `onViewed?(annotationId)`, `className?`. Renders `<div data-article-body class="reader-prose">`. An empty `contentHtml` falls back to sanitizing `content`.
+- `ArticleRenderer`: props `content`, `contentHtml`, `sanitize` (required), `annotations`, `activeAnnotationId`, `onAnnotationSelect`, `onViewed?(annotationId)`, `className?`, `wrapperClassName?`. Renders `<div data-reader-article class="reader-article">` (the class is `wrapperClassName` when given) around `<div data-article-body class="reader-prose">`. Code in the article keeps the app's own monospace font. An empty `contentHtml` falls back to sanitizing `content`.
 - `useParagraphs(containerRef, ready)` numbers leaf blocks with `data-para` and marks the drop-cap paragraph. Returns `{ count, version }`.
 - `useHighlights({ containerRef, docs, version })` finds each `{ text, kind, paragraphIndex? }` in the article by its text, registers the ranges with the CSS Custom Highlight API (`::highlight(user-highlight)`, `user-underline`) and selects a mark on click. Does nothing where the API is missing.
 - `useReaderSettings(storageKey?)` keeps `ReaderSettings` in localStorage (default key `reader:settings`) across tabs. `parseReaderSettings` repairs stored values field by field.

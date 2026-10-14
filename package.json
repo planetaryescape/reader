@@ -1,6 +1,6 @@
 {
   "name": "@planetaryescape/reader",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Reading-surface building blocks shared by Marginalia and mxr: article renderer, text-range quote highlights, reader settings model, and plain-CSS themes and typography.",
   "license": "MIT OR Apache-2.0",
   "type": "module",
