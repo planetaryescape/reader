@@ -1,6 +1,6 @@
 {
   "name": "@planetaryescape/reader",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Reading-surface building blocks shared by Marginalia and mxr: article renderer, text-range quote highlights, reader settings model, and plain-CSS themes and typography.",
   "license": "MIT OR Apache-2.0",
   "type": "module",
@@ -22,10 +22,10 @@
     "LICENSE-APACHE"
   ],
   "scripts": {
-    "build": "rm -rf dist && tsc -p tsconfig.build.json && cp src/reader.css dist/reader.css",
+    "build:dist": "rm -rf dist && tsc -p tsconfig.build.json && cp src/reader.css dist/reader.css",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "check:dist": "bun run build && git diff --exit-code -- dist && test -z \"$(git ls-files --others --exclude-standard dist)\""
+    "check:dist": "bun run build:dist && git diff --exit-code -- dist && test -z \"$(git ls-files --others --exclude-standard dist)\""
   },
   "dependencies": {
     "zod": "^4"

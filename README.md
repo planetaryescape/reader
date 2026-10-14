@@ -69,7 +69,7 @@ Pure helpers: `findTextRange`, `normalizeText`, `rangeContainsPoint`, `findMark`
 ```sh
 bun install
 bun run typecheck && bun run test
-bun run build        # tsc -> dist/, copies reader.css
+bun run build:dist   # tsc -> dist/, copies reader.css
 bun run check:dist   # fails when dist/ differs from a fresh build
 ```
 
